@@ -1,0 +1,26 @@
+{
+  "name": "callbackbundler",
+  "version": "1.0.0",
+  "description": "A tool to bundle callbacks and attach to any object that supports event listener.",
+  "main": "callbackbundler.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yqlim/CallbackBundler.git"
+  },
+  "keywords": [
+    "callback",
+    "callbacks",
+    "bundler",
+    "callback bundler",
+    "callbackbundler"
+  ],
+  "author": "Yong Quan Lim <yqlim2394@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yqlim/CallbackBundler/issues"
+  },
+  "homepage": "https://github.com/yqlim/CallbackBundler#readme"
+}
