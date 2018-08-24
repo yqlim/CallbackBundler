@@ -2,7 +2,7 @@
   "name": "callbackbundler",
   "version": "1.0.0",
   "description": "A tool to bundle callbacks and attach to any object that supports event listener.",
-  "main": "callbackbundler.min.js",
+  "main": "callbackbundler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

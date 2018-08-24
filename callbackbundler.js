@@ -1,3 +1,8 @@
+/**
+ * CallbackBundler
+ * Copyright (c) by Yong Quan Lim
+ * Distributed under MIT license: https://github.com/yqlim/CallbackBundler/blob/master/LICENSE
+ */
 (function(global, factory){
 
     if (typeof exports === 'object' && typeof module !== 'undefined')
@@ -11,8 +16,8 @@
 
     'use strict';
 
-    // Scoped polyfill for Object.defineProperties
-    function defineProperties(proto, desc){
+    // Simplified & browser compatible defineProperties
+    function define(proto, desc){
         var key, val;
         for (key in desc){
             val = desc[key];
@@ -36,7 +41,7 @@
     // CallbackBundler instance can use all methods of an Array instance
     CallbackBundler.prototype = Object.create(Array.prototype);
 
-    defineProperties(CallbackBundler.prototype, {
+    define(CallbackBundler.prototype, {
 
         size: {
             get: function(){
@@ -44,31 +49,30 @@
             }
         },
 
-        add: function(callback){
-            if (typeof callback !== 'function')
-                throw new TypeError('CallbackBundler.add: Argument type of function is expected.');
+        add: function(){
+            var i, len, callback;
 
-            this.push(callback);
+            for (i = 0, len = arguments.length; i < len; i++){
+                callback = arguments[i];
 
-            return true;
+                if (typeof callback !== 'function')
+                    throw new TypeError('Argument[' + i + '] is not type of function.');
+
+                this.push(arguments[i]);
+            }
         },
 
-        remove: function(callback){
-            var i;
+        remove: function(){
+            var i, len, callback;
 
-            if (typeof callback === 'function')
-                i = this.indexOf(callback);
-            else if (typeof callback === 'number')
-                i = callback;
-            else
-                throw new TypeError('CallbackBundler.remove: Only argument type of function and number is accepted.');
+            for (i = 0, len = arguments.length; i < len; i++){
+                callback = arguments[i];
 
-            if (i < 0 || i >= this.length)
-                return false;
+                if (typeof callback !== 'function')
+                    throw new TypeError('Argument[' + i + '] is not type of function.');
 
-            this.splice(i, 1);
-
-            return true;
+                this.splice(i, 1);
+            }
         },
 
         // Attach bundled callbacks to an object with its own API
@@ -78,10 +82,10 @@
             api = obj[api];
 
             if (typeof api !== 'function')
-                throw new TypeError('CallbackBundler.attach: "' + arguments[1] + '" is not a valid event listener attachment method of object provided as arguments[0].');
+                throw new TypeError('"' + arguments[1] + '" is not a valid event listener attachment method of the object provided as arguments[0].');
 
             if (typeof type !== 'string')
-                throw new TypeError('CallbackBundler.attach: Event type is not specified.');
+                throw new TypeError('Event type expects a string value.');
 
             api = api.bind(obj, type);
             args = [];
@@ -95,15 +99,22 @@
         },
 
         // Run the bundled callbacks independently in sequence
-        run: function(ctx){
-            var i, len,
-                args = [];
+        run: function(ctx, args){
+            var i, len, arg;
 
-            for (i = 1, len = arguments.length; i < len; i++)
-                args.push(arguments[i]);
+            args = args || [];
 
-            for (i = 0, len = this.length; i < len; i++)
-                this[i].apply(ctx, args);
+            if (args && args.constructor !== Array)
+                throw new TypeError('Argument[1] must be an array.');
+
+            for (i = 0, len = this.length; i < len; i++){
+                arg = args[i] || [];
+
+                if (arg && arg.constructor !== Array)
+                    arg = [arg];
+
+                this[i].apply(ctx, arg);
+            }
         }
 
     });
