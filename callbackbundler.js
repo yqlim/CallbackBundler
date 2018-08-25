@@ -1,7 +1,7 @@
 /**
  * CallbackBundler
  * Copyright (c) by Yong Quan Lim
- * Distributed under MIT license: https://github.com/yqlim/CallbackBundler/blob/master/LICENSE
+ * Distributed under MIT license: https://github.com/yqlim/CallbackBundler
  */
 (function(global, factory){
 
@@ -15,18 +15,22 @@
 })(this, function(){
 
     'use strict';
+    
+    function createDescriptor(desc){
+        var key;
 
-    // Simplified & browser compatible defineProperties
-    function define(proto, desc){
-        var key, val;
-        for (key in desc){
-            val = desc[key];
-            Object.defineProperty(proto, key, (val && typeof val === 'object' && ('get' in val || 'set' in val)) ? val : {
-                value: val,
-                writable: false,
-                enumerable: false,
-                configurable: false
-            });
+        for (key in desc)
+            if (!isDescriptor(desc[key]))
+                desc[key] = { value: desc[key] }
+
+        return desc;
+
+        function isDescriptor(obj){
+            if (!obj || typeof obj !== 'object')
+                return false;
+
+            return ('get' in obj || 'set' in obj)
+                || ('value' in obj && ('writable' in obj || 'enumerable' in obj || 'configurable' in obj))
         }
     }
 
@@ -39,9 +43,9 @@
     }
 
     // CallbackBundler instance can use all methods of an Array instance
-    CallbackBundler.prototype = Object.create(Array.prototype);
+    CallbackBundler.prototype = Object.create(Array.prototype, createDescriptor({
 
-    define(CallbackBundler.prototype, {
+        constructor: CallbackBundler,
 
         size: {
             get: function(){
@@ -95,7 +99,24 @@
                 args.push(arguments[i]);
 
             for (i = 0, len = this.length; i < len; i++)
+                // This ensures the pattern: obj.api(type, callback, ...args)
                 api.apply(api, [this[i]].concat(args));
+        },
+
+        detach: function(obj, api, type){
+            var i, len, args;
+
+            api = obj[api];
+
+            if (typeof api !== 'function')
+                throw new TypeError('"' + arguments[1] + '" is not a valid event listener attachment method of the object provided as arguments[0].');
+
+            if (typeof type !== 'string')
+                throw new TypeError('Event type expects a string value.');
+
+            for (i = 0, len = this.length; i < len; i++)
+                // This ensures the pattern: obj.api(type, callback)
+                api.call(obj, type, this[i]);
         },
 
         // Run the bundled callbacks independently in sequence
@@ -117,7 +138,7 @@
             }
         }
 
-    });
+    }));
 
     return CallbackBundler;
 
