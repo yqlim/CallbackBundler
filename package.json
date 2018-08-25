@@ -1,6 +1,6 @@
 {
   "name": "callbackbundler",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A JavaScript tool to bundle callbacks and attach to any object that supports event listener.",
   "main": "callbackbundler.js",
   "scripts": {
